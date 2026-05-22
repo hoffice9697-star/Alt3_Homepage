@@ -14,8 +14,8 @@ function initVideoManager() {
 
   if (!el1 || !el2 || !track) return;
 
-  const src1 = lsGet('vid1') || 'videos/scene1.mp4';
-  const src2 = lsGet('vid2') || 'videos/scene2.mp4';
+  const src1 = lsGet('vid1') || 'https://vimeo.com/1194171718';
+  const src2 = lsGet('vid2') || 'https://vimeo.com/1194171729';
 
   const id1 = _getVimeoId(src1);
   const id2 = _getVimeoId(src2);
