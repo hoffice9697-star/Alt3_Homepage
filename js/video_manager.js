@@ -40,11 +40,12 @@ function initVideoManager() {
   // ── Build Vimeo players ──
   function _makeVimeo(el, videoId, onReady) {
     const p = new Vimeo.Player(el, {
-      id: videoId, background: true, muted: true,
+      id: videoId, background: true, muted: true, autopause: false,
       width: el.offsetWidth || window.innerWidth,
     });
-    p.getDuration().then(d => {
-      if (onReady) onReady(d);
+    p.ready().then(() => {
+      p.pause(); // 자동재생 중지 — 스크롤 스크러빙만 사용
+      p.getDuration().then(d => { if (onReady) onReady(d); });
     });
     return p;
   }
