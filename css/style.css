@@ -1,0 +1,890 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   1. RESET & BASE
+   ─────────────────────────────────────
+   전역 초기화 및 기본 설정
+   · 배경색 #0C0C0C (검정), 텍스트 #ffffff
+   · 폰트: Kanit (index.html에서 Google Fonts 로드)
+   · cursor: none — 커스텀 커서 사용을 위해 기본 커서 숨김
+   · .hero-heading-style: 그라디언트 텍스트 유틸 클래스
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0C0C0C;
+  color: #ffffff;
+  font-family: 'Kanit', sans-serif;
+  overflow-x: clip;
+  cursor: none;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   2. CUSTOM CURSOR
+   ─────────────────────────────────────
+   기본 마우스 커서를 흰 원형으로 대체
+   · 기본 크기 18px, hover 시 56px로 확대
+   · mix-blend-mode: difference — 배경과 색상 자동 반전
+   · cursor_manager.js 가 mousemove 이벤트로 위치 업데이트
+   수정 시 주의: config.js의 CURSOR_CONFIG 값과 동기화
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#customCursor {
+  position: fixed;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.2s ease;
+  will-change: left, top;
+}
+#customCursor.cursor-hover  { width: 56px; height: 56px; }
+#customCursor.cursor-hidden { opacity: 0; }
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; }
+img { display: block; max-width: 100%; }
+::selection { background: #ffffff; color: #0C0C0C; }
+
+/* Gradient text utility */
+.hero-heading-style {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   3. CONTACT BUTTON (유틸)
+   ─────────────────────────────────────
+   그라디언트 CTA 버튼 (.contact-btn)
+   · 현재 index.html에서 미사용 — 향후 Contact 섹션 버튼 용도
+   · 퍼플→마젠타→오렌지 그라디언트, 흰색 outline
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.contact-btn {
+  display: inline-block;
+  border-radius: 9999px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #fff;
+  padding: 12px 32px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%);
+  box-shadow: 0px 4px 4px rgba(181,1,167,0.25), inset 4px 4px 12px #7721B1;
+  outline: 2px solid white;
+  outline-offset: -3px;
+  border: none;
+}
+.contact-btn:hover { opacity: 0.85; }
+
+@media (min-width: 640px)  { .contact-btn { padding: 14px 40px; font-size: 14px; } }
+@media (min-width: 768px)  { .contact-btn { padding: 16px 48px; font-size: 16px; } }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   4. FIXED NAVBAR
+   ─────────────────────────────────────
+   상단 중앙 고정 필 네비게이션
+   · .nav-pill: 전체를 감싸는 dark glass 필 컨테이너
+   · .nav-home: HOME 링크만 테두리 박스 강조
+   · nav_manager.js 가 스크롤 이벤트 관리
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.hero-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px;
+  pointer-events: none;
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(12,12,12,0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  padding: 5px;
+  pointer-events: auto;
+  position: relative;
+}
+
+.nav-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.05);
+  pointer-events: none;
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 22px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-indent: 0.08em;
+  color: rgba(255,255,255,0.6);
+  transition: color 0.2s;
+  border: 1px solid transparent;
+}
+.nav-link:hover { color: #ffffff; }
+
+/* 활성 nav 링크 — 스크롤 위치에 따라 이동 */
+.nav-link.active {
+  color: #ffffff;
+}
+
+.lang-toggle {
+  padding: 9px 18px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.06);
+  transition: background 0.2s, border-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lang-toggle:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.6); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   5. SCROLL STAGE (영상 인트로)
+   ─────────────────────────────────────
+   스크롤에 따라 영상이 재생되는 전체화면 인트로
+   · #stickyCanvas: 뷰포트에 고정(sticky)된 영상 캔버스
+   · #scrollTrack: 스크롤 거리 확보용 (height = 영상 스크롤 길이)
+   · .stage-chapter: 진행도에 따라 나타나는 챕터 텍스트 오버레이
+   · #progressBar: 하단 가로 진행 바
+   · #scrollCue: "Scroll" 안내 애니메이션 (5% 이후 자동 숨김)
+   수정 시 주의: video_manager.js 의 _applyProgress() 와 연동
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#scrollStage { position: relative; }
+
+#stickyCanvas {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#scrollTrack { height: 250vh; }
+
+.stage-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0; transition: opacity 0.5s ease; z-index: 0;
+  overflow: hidden;
+}
+.stage-video.active { opacity: 1; }
+.stage-video iframe {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 177.78vh; /* 16:9 at 100vh height */
+  height: 100vh;
+  min-width: 100%; min-height: 56.25vw;
+  pointer-events: none;
+}
+
+.stage-vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 25%, rgba(12,12,12,0.72) 100%);
+}
+
+.stage-bottom-fade {
+  position: absolute; inset-x: 0; bottom: 0; height: 180px; z-index: 1; pointer-events: none;
+  background: linear-gradient(to top, #0C0C0C, transparent);
+}
+
+/* Chapter text overlays */
+.stage-chapter {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 48px 56px;
+  opacity: 0; transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+.stage-chapter.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.ch-eyebrow {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6); margin-bottom: 16px;
+}
+.ch-name {
+  font-size: clamp(52px, 10vw, 140px);
+  font-weight: 900; line-height: 0.88;
+  letter-spacing: -0.02em;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.ch-name em { font-style: normal; }
+.ch-rule { width: 48px; height: 1px; background: #ffffff; opacity: 0.3; margin-top: 24px; }
+.ch-tag  { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+.ch-quote {
+  font-size: clamp(22px, 3.2vw, 48px);
+  font-weight: 300; line-height: 1.25; color: #fff;
+  font-family: 'Raleway', sans-serif;
+}
+.ch-cta {
+  display: inline-block; margin-top: 24px;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #ffffff; border-bottom: 1px solid currentColor;
+  padding-bottom: 3px; width: fit-content; transition: letter-spacing 0.3s;
+}
+.ch-cta:hover { letter-spacing: 0.32em; }
+
+/* Progress bar */
+#progressBar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: rgba(255,255,255,0.05); z-index: 4;
+}
+#progressFill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.3));
+  transition: width 0.1s linear;
+}
+
+/* Scroll cue */
+#scrollCue {
+  position: absolute; bottom: 36px; right: 48px; z-index: 4;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: opacity 0.5s;
+}
+.sc-text { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.4); writing-mode: vertical-rl; }
+.sc-line  { width: 1px; height: 48px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.sc-dot   { width: 1px; height: 12px; background: #ffffff; animation: scDrop 1.5s ease-in-out infinite; }
+
+@keyframes scDrop {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(400%); opacity: 0; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   6. MARQUEE (이미지 슬라이더)
+   ─────────────────────────────────────
+   스크롤 속도에 반응하는 GIF 이미지 두 줄 마퀴
+   · .mq-row: 이미지 가로 나열 행 (위 줄은 오른쪽, 아래 줄은 왼쪽으로 이동)
+   · 이미지 크기: width 320px / height 200px
+   · scroll_manager.js 의 _initMarquee() 가 translateX 값을 계산
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#marqueeSection {
+  background: #0C0C0C;
+  padding-top: 96px;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+@media (min-width: 640px)  { #marqueeSection { padding-top: 128px; } }
+@media (min-width: 768px)  { #marqueeSection { padding-top: 160px; } }
+
+.mq-row {
+  display: flex;
+  gap: 12px;
+  will-change: transform;
+}
+
+.mq-row img {
+  width: 320px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   7. ABOUT
+   ─────────────────────────────────────
+   2컬럼 그리드 레이아웃 소개 섹션
+   · 왼쪽 (.about-left): 이름 / 바이오 텍스트 / 수상 목록
+   · 오른쪽 (.about-right): Software 스킬바 목록
+   · .skill-fill: width 0 → var(--w) 애니메이션 (스크롤 진입 시 트리거)
+     트리거: scroll_manager.js 의 _initSkillBars() — IntersectionObserver
+   · .about-bio .char: 스크롤에 따라 글자별 opacity 변화 (character animation)
+     트리거: scroll_manager.js 의 _initCharAnimation()
+   수정 시 주의: 768px 이하에서 1컬럼으로 전환됨
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#about {
+  padding: 100px 0;
+  background: #0C0C0C;
+}
+
+.about-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.about-left {
+  padding: 0 56px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.about-sec-num {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 24px;
+}
+
+.about-name {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 900;
+  line-height: 0.9;
+  margin-bottom: 28px;
+}
+
+.about-bio {
+  font-size: 14px;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.6);
+  max-width: 440px;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.about-bio .char {
+  display: inline-block;
+  opacity: 0.2;
+  transition: opacity 0.05s;
+}
+
+.award-list { display: flex; flex-direction: column; }
+
+.award-row {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}
+
+.ay {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  width: 34px;
+  flex-shrink: 0;
+}
+
+.about-right {
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+#skillRadarContainer {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skill-label {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 20px;
+  align-self: flex-start;
+  width: 100%;
+}
+
+.skill-list { display: flex; flex-direction: column; gap: 16px; }
+
+.skill-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.skill-item span { font-size: 12px; color: rgba(255,255,255,0.55); }
+
+.skill-bar {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  position: relative;
+}
+
+.skill-fill {
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 0;
+  background: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.25));
+  transition: width 1.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.skill-fill.animated { width: var(--w); }
+
+@media (max-width: 768px) {
+  .about-wrap { grid-template-columns: 1fr; }
+  .about-left { padding: 0 24px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 48px; }
+  .about-right { padding: 40px 24px 0; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   8. SERVICES
+   ─────────────────────────────────────
+   흰 배경의 서비스 목록 섹션
+   · 상단 border-radius 로 이전 섹션과 겹치는 효과
+   · .service-item: 번호 + 설명 2열 구성, 스크롤 시 fade-in-up
+     트리거: scroll_manager.js 의 _initFadeInUp() — IntersectionObserver
+   · --delay CSS 변수로 항목별 순차 등장 딜레이 (HTML inline style로 설정)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#services {
+  background: #ffffff;
+  border-radius: 40px 40px 0 0;
+  padding: 80px 20px;
+}
+
+@media (min-width: 640px)  { #services { border-radius: 50px 50px 0 0; padding: 96px 32px; } }
+@media (min-width: 768px)  { #services { border-radius: 60px 60px 0 0; padding: 128px 40px; } }
+
+.services-heading {
+  color: #0C0C0C;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 64px;
+  font-size: clamp(3rem, 12vw, 160px);
+}
+
+@media (min-width: 640px)  { .services-heading { margin-bottom: 80px; } }
+@media (min-width: 768px)  { .services-heading { margin-bottom: 112px; } }
+
+.services-list { max-width: 900px; margin: 0 auto; }
+
+.service-item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 0;
+  border-bottom: 1px solid rgba(12,12,12,0.15);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease var(--delay,0s), transform 0.7s ease var(--delay,0s);
+}
+.service-item.visible { opacity: 1; transform: translateY(0); }
+
+@media (min-width: 640px)  { .service-item { padding: 40px 0; } }
+@media (min-width: 768px)  { .service-item { padding: 48px 0; } }
+
+.service-num {
+  color: #0C0C0C;
+  font-weight: 900;
+  line-height: 1;
+  flex-shrink: 0;
+  font-size: clamp(3rem, 10vw, 140px);
+  width: 1.3em;
+}
+
+.service-body { padding-top: 8px; }
+
+.service-name {
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #0C0C0C;
+  margin-bottom: 8px;
+  font-size: clamp(1rem, 2.2vw, 2.1rem);
+}
+
+.service-desc {
+  font-weight: 300;
+  line-height: 1.65;
+  color: #0C0C0C;
+  opacity: 0.6;
+  max-width: 672px;
+  font-size: clamp(0.85rem, 1.6vw, 1.25rem);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   9. PROJECTS (스택 카드)
+   ─────────────────────────────────────
+   스크롤 시 카드가 쌓이는 스택 효과
+   · .stack-card-wrap: 카드 1장의 스크롤 구간 (height = 스크롤 거리)
+   · .stack-card-inner: 실제 카드 (position:sticky, 뷰포트에 고정)
+     - height: clamp(680px, calc(100vh-96px), 1020px) — 카드 높이 조절
+     - display:flex + flex-direction:column — 이미지가 남은 공간 자동 채움
+   · #projects .stack-card-wrap:last-child: 마지막 카드 래퍼
+     - 더 길게 설정해야 sticky 해제 후 footer가 보임
+   · .card-num: 카드 번호 (01/02/03) 크기 — font-size clamp 조절
+   · .card-img-grid: 큰 이미지(60%) + 작은 이미지 2장(40%) flex 레이아웃
+   수정 시 주의: 카드 모션 로직은 scroll_manager.js 의 _initStackCards()
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#projects {
+  background: #0C0C0C;
+  border-radius: 40px 40px 0 0;
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+  padding: 80px 20px 0;
+  isolation: isolate;
+}
+
+@media (min-width: 640px)  { #projects { border-radius: 50px 50px 0 0; margin-top: -48px; } }
+@media (min-width: 768px)  { #projects { border-radius: 60px 60px 0 0; margin-top: -56px; padding: 128px 32px 0; } }
+
+.projects-heading {
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 80px;
+  font-size: clamp(3rem, 12vw, 160px);
+}
+
+@media (min-width: 768px) { .projects-heading { margin-bottom: 112px; } }
+
+/* Stack card */
+.stack-card-wrap {
+  height: 1040px;
+  position: relative;
+}
+
+/* 그룹 내 마지막 카드 — sticky 해제 후 footer 노출 */
+.project-group .stack-card-wrap:last-child {
+  height: 1400px;
+}
+
+.stack-card-inner {
+  position: sticky;
+  left: 0; right: 0;
+  height: 1000px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 40px;
+  border: 2px solid #ffffff;
+  background: #0C0C0C;
+  padding: 16px;
+  transform-origin: top center;
+  will-change: transform;
+  overflow: hidden;
+}
+
+@media (min-width: 640px)  { .stack-card-inner { border-radius: 50px; padding: 24px; } }
+@media (min-width: 768px)  { .stack-card-inner { border-radius: 60px; padding: 32px; } }
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.card-num {
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: clamp(3rem, 8vw, 150px);
+}
+
+.card-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 24px;
+}
+
+.card-cat {
+  font-size: 22px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.card-title {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+}
+
+.live-btn {
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 12px 32px;
+  font-size: 14px;
+  font-family: 'Kanit', sans-serif;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.live-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* Card image grid — 큰 이미지 왼쪽, 작은 두 장 오른쪽 */
+.card-img-grid {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  max-height: 720px; /* 카드가 커져도 이미지 영역 높이 고정 */
+}
+
+/* 왼쪽: 큰 이미지 (60%) */
+.card-col-big {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-col-big img {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  object-fit: cover;
+  border-radius: 40px;
+}
+
+@media (min-width: 640px)  { .card-col-big img { border-radius: 50px; } }
+@media (min-width: 768px)  { .card-col-big img { border-radius: 60px; } }
+
+/* 오른쪽: 작은 이미지 두 장 (40%) — 위(2번) → 아래(3번) */
+.card-col-small {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-col-small img:first-child,
+.card-col-small img:last-child {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  object-fit: cover;
+  border-radius: 40px;
+}
+
+@media (min-width: 640px)  { .card-col-small img { border-radius: 50px !important; } }
+@media (min-width: 768px)  { .card-col-small img { border-radius: 60px !important; } }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   10. FOOTER
+   ─────────────────────────────────────
+   하단 저작권 표시 및 어드민 진입점
+   · .admin-trigger (© 심볼): 클릭 시 어드민 모달 오픈
+     - opacity 0.6 → hover 시 1.0 으로 밝아짐
+   · admin_manager.js 가 클릭 이벤트 처리
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+footer {
+  padding: 24px 40px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
+  background: #0C0C0C;
+}
+
+.admin-trigger {
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.admin-trigger:hover {
+  opacity: 1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   11. ADMIN MODAL
+   ─────────────────────────────────────
+   © 클릭 시 나타나는 비밀번호 입력 팝업
+   · .admin-modal: 기본 display:none, .open 클래스 추가 시 flex로 표시
+   · 로그인 성공 시 admin.html 로 이동 (admin_manager.js 처리)
+   · 기본 비밀번호는 admin.html Security 탭에서 반드시 변경하세요
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.admin-modal {
+  display: none; position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,0.88); align-items: center; justify-content: center;
+}
+.admin-modal.open { display: flex; }
+.admin-modal-box {
+  background: #161616;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 36px;
+  width: 300px;
+  position: relative;
+}
+.admin-modal-box h3 {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+.admin-modal-box input {
+  width: 100%;
+  background: #0C0C0C;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #ffffff;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 8px;
+  font-family: 'Kanit', sans-serif;
+}
+.admin-modal-box input:focus { border-color: rgba(255,255,255,0.4); }
+.admin-error { font-size: 11px; color: #e05050; min-height: 16px; margin-bottom: 14px; }
+.admin-login-btn {
+  width: 100%;
+  background: #ffffff;
+  color: #0C0C0C;
+  padding: 10px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: 'Kanit', sans-serif;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.admin-login-btn:hover { opacity: 0.85; }
+.admin-modal-close { position: absolute; top: 12px; right: 14px; font-size: 14px; color: rgba(255,255,255,0.45); }
+.admin-modal-close:hover { color: #ffffff; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   12. PROJECT TABS & GROUPS
+   ─────────────────────────────────────
+   카테고리 탭 필 + 그룹 표시/숨김
+   · .project-tab-pill: Work | Student | Other Projects 탭
+   · .ptab.active: 흰 배경 / 검정 텍스트 활성 상태
+   · .project-group: 기본 숨김, .active 시 표시
+   수정 시 주의: 탭 전환 JS는 index.html 인라인 스크립트
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.project-tab-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.project-tab-pill {
+  display: inline-flex;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9999px;
+  padding: 4px;
+  gap: 2px;
+  position: relative;
+}
+
+.proj-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  border-radius: 9999px;
+  background: #ffffff;
+  pointer-events: none;
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ptab {
+  padding: clamp(8px, 2vw, 15px) clamp(16px, 4vw, 42px);
+  border-radius: 9999px;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Kanit', sans-serif;
+  transition: background 0.2s, color 0.2s;
+}
+.ptab.active { background: transparent; color: #0C0C0C; position: relative; }
+.ptab:hover:not(.active) { color: rgba(255,255,255,0.8); }
+
+.project-group { display: none; }
+.project-group.active { display: block; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   13. FADE ANIMATIONS (공통 유틸)
+   ─────────────────────────────────────
+   스크롤 시 요소가 나타나는 공통 애니메이션 클래스
+   · .fade-in-up: 아래서 위로 슬라이드하며 등장
+   · .fade-deco-l: 왼쪽에서 슬라이드 (좌측 장식 요소용)
+   · .fade-deco-r: 오른쪽에서 슬라이드 (우측 장식 요소용)
+   · .visible 클래스 추가 시 등장 — scroll_manager.js 의 _initFadeInUp() 처리
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.fade-in-up  { opacity: 0; transform: translateY(30px);  transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-deco-l { opacity: 0; transform: translateX(-80px); transition: opacity 0.9s ease, transform 0.9s ease; }
+.fade-deco-r { opacity: 0; transform: translateX(80px);  transition: opacity 0.9s ease, transform 0.9s ease; }
+
+.fade-in-up.visible, .fade-deco-l.visible, .fade-deco-r.visible {
+  opacity: 1; transform: translate(0, 0);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   14. CHAR ANIMATION (Home 텍스트 등장)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.char-ani {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: charReveal 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+  animation-play-state: paused;
+}
+.stage-chapter.visible .char-ani {
+  animation-play-state: running;
+}
+/* 그라디언트 텍스트 안의 char-ani — 각 span에 개별 그라디언트 적용 */
+.hero-heading-style .char-ani {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes charReveal {
+  to { opacity: 1; transform: translateY(0); }
+}

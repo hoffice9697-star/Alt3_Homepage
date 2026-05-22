@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — HeeJae Kim PORTFOLIO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #0C0C0C; color: #D7E2EA; font-family: 'Kanit', sans-serif; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; }
+
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+    /* Sidebar */
+    .admin-sidebar { background: #111; border-right: 1px solid rgba(255,255,255,0.08); padding: 32px 24px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-logo { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 28px; color: #fff; }
+    .sidebar-logo span { font-size: 10px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); display: block; margin-top: 4px; }
+    .nav-item { display: block; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 400; letter-spacing: 0.04em; color: rgba(255,255,255,0.55); transition: background 0.15s, color 0.15s; cursor: pointer; text-align: left; width: 100%; }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.06); color: #fff; }
+    .sidebar-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
+    .sidebar-bottom { margin-top: auto; }
+    .logout-btn { display: block; padding: 10px 14px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 100%; text-align: center; transition: color 0.15s, border-color 0.15s; }
+    .logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+    /* Main */
+    .admin-main { padding: 40px 48px; overflow-y: auto; }
+    .admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+    .admin-topbar h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.02em; }
+    .back-link { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); border-bottom: 1px solid currentColor; padding-bottom: 2px; transition: color 0.2s; }
+    .back-link:hover { color: #fff; }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Cards */
+    .section-card { background: #161616; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; margin-bottom: 20px; }
+    .section-card h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+
+    /* Forms */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .form-input, .form-textarea { background: #0C0C0C; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 14px; font-size: 13px; font-family: 'Kanit', sans-serif; outline: none; border-radius: 6px; transition: border-color 0.2s; width: 100%; }
+    .form-input:focus, .form-textarea:focus { border-color: rgba(255,255,255,0.4); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-range-row { display: grid; grid-template-columns: 140px 1fr 40px; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .form-range-row label { font-size: 12px; color: rgba(255,255,255,0.6); }
+    input[type="range"] { width: 100%; accent-color: #fff; cursor: pointer; }
+    .range-val { font-size: 12px; color: rgba(255,255,255,0.5); text-align: right; }
+
+    /* Buttons */
+    .save-btn { background: #fff; color: #0C0C0C; padding: 10px 28px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; font-family: 'Kanit', sans-serif; border-radius: 6px; transition: opacity 0.2s; margin-top: 20px; }
+    .save-btn:hover { opacity: 0.85; }
+    .save-btn.ghost { background: rgba(255,255,255,0.08); color: #fff; margin-left: 10px; }
+    .save-btn.danger { background: #c0392b; color: #fff; }
+    .icon-btn { padding: 4px 10px; font-size: 11px; letter-spacing: 0.08em; border-radius: 4px; transition: background 0.15s; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.12); }
+    .icon-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .icon-btn.red { border-color: rgba(192,57,43,0.4); color: rgba(192,57,43,0.8); }
+    .icon-btn.red:hover { background: rgba(192,57,43,0.15); color: #e74c3c; }
+    .add-btn { background: rgba(255,255,255,0.08); color: #fff; padding: 8px 18px; font-size: 12px; letter-spacing: 0.1em; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); transition: background 0.15s; }
+    .add-btn:hover { background: rgba(255,255,255,0.14); }
+
+    /* Project list */
+    .proj-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .proj-tab { padding: 9px 22px; border-radius: 9999px; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: background 0.15s, color 0.15s; font-family: 'Kanit', sans-serif; cursor: pointer; }
+    .proj-tab.active { background: #fff; color: #0C0C0C; border-color: #fff; }
+
+    .proj-list-item { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .proj-list-item:last-child { border-bottom: none; }
+    .proj-thumb { width: 60px; height: 42px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #222; }
+    .proj-info { flex: 1; min-width: 0; }
+    .proj-info strong { display: block; font-size: 13px; font-weight: 500; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .proj-info span { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; }
+    .proj-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* About photo */
+    .photo-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); display: none; margin-bottom: 12px; }
+    .file-label { display: inline-block; background: rgba(255,255,255,0.08); color: #fff; padding: 9px 20px; font-size: 12px; letter-spacing: 0.1em; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); cursor: pointer; transition: background 0.15s; }
+    .file-label:hover { background: rgba(255,255,255,0.14); }
+    input[type="file"] { display: none; }
+
+    /* Password */
+    .pass-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 32px; right: 32px; background: #fff; color: #0C0C0C; padding: 12px 24px; font-size: 12px; letter-spacing: 0.1em; font-weight: 600; border-radius: 8px; opacity: 0; transform: translateY(12px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 999; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">
+      HeeJae Kim
+      <span>Admin Panel</span>
+    </div>
+
+    <button class="nav-item active" data-panel="site">Site Settings</button>
+    <button class="nav-item"        data-panel="projects">Projects</button>
+    <button class="nav-item"        data-panel="videos">Videos</button>
+    <button class="nav-item"        data-panel="cards">Card Size</button>
+    <button class="nav-item"        data-panel="about">About</button>
+    <button class="nav-item"        data-panel="security">Security</button>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-divider"></div>
+      <a href="index.html" class="logout-btn">← Back to Site</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 id="panelTitle">Site Settings</h1>
+      <a href="index.html" class="back-link">View Site →</a>
+    </div>
+
+    <!-- Panel: Site Settings -->
+    <div class="panel active" id="panelSite">
+      <div class="section-card">
+        <h2>Basic Info</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Site Name (표시 이름)</label>
+            <input class="form-input" id="cfgSiteName" type="text" placeholder="HeeJae Kim">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Browser Tab Title</label>
+            <input class="form-input" id="cfgSiteTitle" type="text" placeholder="HeeJae Kim PORTFOLIO">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Footer Text</label>
+          <input class="form-input" id="cfgFooter" type="text" placeholder="© 2025 Kim Hee Jae · Seoul, Korea">
+        </div>
+        <button class="save-btn" id="saveSite">Save</button>
+      </div>
+      <div class="section-card">
+        <h2>Home Text (영어 기준)</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Eyebrow (직업 소개, 예: Architect)</label>
+            <input class="form-input" id="cfgEyebrow" type="text" placeholder="Architect">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chapter 2 Tag (예: Architecture / Design / Planning)</label>
+            <input class="form-input" id="cfgChTag" type="text" placeholder="Architecture / Design / Planning">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Chapter 2 Quote (메인 문구)</label>
+          <input class="form-input" id="cfgChQuote" type="text" placeholder="Designing Spaces That Inspire and Endure">
+        </div>
+        <div class="form-row" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">메인 이름 (예: HeeJae Kim)</label>
+            <input class="form-input" id="cfgChNameLine1" type="text" placeholder="HeeJae Kim">
+          </div>
+          <div class="form-group">
+            <label class="form-label">메인 이름 2번째 줄 (예: PORTFOLIO)</label>
+            <input class="form-input" id="cfgChNameLine2" type="text" placeholder="PORTFOLIO">
+          </div>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:20px;">─── 구분선 (ch-rule) 설정</p>
+        <div class="form-range-row">
+          <label>선 길이 (width)</label>
+          <input type="range" id="ruleWidthRange" min="10" max="1800" step="10" value="50">
+          <span class="range-val" id="ruleWidthVal">48px</span>
+        </div>
+        <div class="form-range-row">
+          <label>선 두께 (height)</label>
+          <input type="range" id="ruleHeightRange" min="1" max="8" step="1" value="1">
+          <span class="range-val" id="ruleHeightVal">1px</span>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:20px;margin-top:4px;">✦ 텍스트 등장 속도</p>
+        <div class="form-range-row">
+          <label>글자 등장 시간</label>
+          <input type="range" id="animDurRange" min="0.1" max="2.0" step="0.1" value="0.9">
+          <span class="range-val" id="animDurVal">0.9s</span>
+        </div>
+        <div class="form-range-row">
+          <label>글자 간 딜레이</label>
+          <input type="range" id="animDelayRange" min="0.01" max="0.2" step="0.01" value="0.075">
+          <span class="range-val" id="animDelayVal">0.075s</span>
+        </div>
+        <button class="save-btn" id="saveHomeText">Save</button>
+      </div>
+    </div>
+
+    <!-- Panel: Projects -->
+    <div class="panel" id="panelProjects">
+      <div class="proj-tabs">
+        <button class="proj-tab active" data-cat="work">Work</button>
+        <button class="proj-tab" data-cat="student">Student</button>
+        <button class="proj-tab" data-cat="other">Other</button>
+      </div>
+
+      <div class="section-card">
+        <h2>
+          <span id="projTabLabel">Work Projects</span>
+          <button class="add-btn" id="addProjBtn">+ Add New</button>
+        </h2>
+        <div id="projList"></div>
+      </div>
+
+      <!-- Add / Edit Form -->
+      <div class="section-card" id="projFormCard" style="display:none;">
+        <h2 id="projFormTitle">New Project</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category (영어)</label>
+            <input class="form-input" id="projCat" type="text" placeholder="Commercial Facility">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category (한국어)</label>
+            <input class="form-input" id="projCatKo" type="text" placeholder="근린생활시설">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title (영어)</label>
+            <input class="form-input" id="projTitle" type="text" placeholder="Nonhyeon-dong, Gangnam">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title (한국어)</label>
+            <input class="form-input" id="projTitleKo" type="text" placeholder="강남구 논현동 80-24">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Images — 여러 장 동시 선택 가능</label>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <label class="file-label" for="projImageFiles">📁 이미지 선택</label>
+            <input type="file" id="projImageFiles" accept="image/*" multiple>
+            <span id="projImgCount" style="font-size:12px;color:rgba(255,255,255,0.4);"></span>
+          </div>
+          <div id="projImgPreview" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+        <div style="display:flex;gap:0;">
+          <button class="save-btn" id="saveProjBtn">Save Project</button>
+          <button class="save-btn ghost" id="cancelProjBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Videos -->
+    <div class="panel" id="panelVideos">
+      <div class="section-card">
+        <h2>Intro Videos</h2>
+        <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;line-height:1.7;">
+          로컬 파일: <strong style="color:#fff;">videos/scene1.mp4</strong> 처럼 입력<br>
+          Vimeo: <strong style="color:#fff;">https://vimeo.com/123456789</strong> URL 그대로 입력
+        </p>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Scene 1 (스크롤 0~50%)</label>
+          <input class="form-input" id="vid1Name" type="text" placeholder="https://vimeo.com/123456789 또는 videos/scene1.mp4">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Scene 2 (스크롤 50~100%)</label>
+          <input class="form-input" id="vid2Name" type="text" placeholder="https://vimeo.com/123456789 또는 videos/scene2.mp4">
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:20px;margin-bottom:12px;">─── 인트로 스크롤 속도</p>
+        <div class="form-range-row">
+          <label>스크롤 거리 (vh)</label>
+          <input type="range" id="scrollTrackRange" min="50" max="600" step="10" value="250">
+          <span class="range-val" id="scrollTrackVal">250vh</span>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;">낮을수록 빠름 · 높을수록 느림 (기본: 250vh)</p>
+        <button class="save-btn" id="saveVideos">Save</button>
+      </div>
+    </div>
+
+    <!-- Panel: Card Size -->
+    <div class="panel" id="panelCards">
+      <div class="section-card">
+        <h2>Card Layout</h2>
+
+        <div class="form-range-row">
+          <label>Scale (크기 비율)</label>
+          <input type="range" id="cardSizeRange" min="50" max="100" step="1" value="85">
+          <span class="range-val" id="cardSizeVal">85%</span>
+        </div>
+
+        <div class="form-range-row">
+          <label>Width (카드 가로 %)</label>
+          <input type="range" id="cardWidthRange" min="40" max="100" step="1" value="100">
+          <span class="range-val" id="cardWidthVal">100%</span>
+        </div>
+
+        <div class="form-range-row">
+          <label>Height (카드 높이)</label>
+          <input type="range" id="cardHeightRange" min="400" max="1200" step="10" value="1000">
+          <span class="range-val" id="cardHeightVal">1000px</span>
+        </div>
+
+        <div class="form-range-row">
+          <label>Side Padding (좌우 여백)</label>
+          <input type="range" id="cardPadRange" min="0" max="120" step="4" value="32">
+          <span class="range-val" id="cardPadVal">32px</span>
+        </div>
+
+        <div class="form-range-row">
+          <label>Card Gap (카드 간격)</label>
+          <input type="range" id="cardGapRange" min="600" max="1600" step="20" value="1040">
+          <span class="range-val" id="cardGapVal">1040px</span>
+        </div>
+
+        <div class="form-range-row">
+          <label>Border Radius (둥글기)</label>
+          <input type="range" id="cardRadiusRange" min="0" max="80" step="4" value="60">
+          <span class="range-val" id="cardRadiusVal">60px</span>
+        </div>
+
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;">저장 후 홈페이지 새로고침하면 적용됩니다.</p>
+        <button class="save-btn" id="saveCards">Save</button>
+      </div>
+    </div>
+
+    <!-- Panel: About -->
+    <div class="panel" id="panelAbout">
+      <!-- Profile Photo -->
+      <div class="section-card">
+        <h2>Profile Photo (About 일러스트)</h2>
+        <img id="aboutPhotoPreview" class="photo-preview" src="" alt="">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <label class="file-label" for="aboutPhotoFile">📁 이미지 선택</label>
+          <input type="file" id="aboutPhotoFile" accept="image/*">
+          <button class="icon-btn red" id="removePhotoBtn">삭제</button>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:10px;">선택한 이미지가 About 섹션 오른쪽에 표시됩니다.</p>
+      </div>
+
+      <!-- Bio -->
+      <div class="section-card">
+        <h2>Bio Text</h2>
+        <div class="form-group">
+          <label class="form-label">About Bio (English)</label>
+          <textarea class="form-textarea" id="cfgBio" style="min-height:100px;"></textarea>
+        </div>
+        <button class="save-btn" id="saveAbout">Save</button>
+      </div>
+
+      <!-- Software Skills -->
+      <div class="section-card">
+        <h2>Software Skills</h2>
+        <div id="skillEditor"></div>
+        <button class="save-btn" id="saveSkills">Save</button>
+      </div>
+    </div>
+
+    <!-- Panel: Security -->
+    <div class="panel" id="panelSecurity">
+      <div class="section-card">
+        <h2>Admin Password</h2>
+        <div class="pass-row" style="margin-bottom:8px;">
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input class="form-input" id="newPass" type="password" placeholder="New password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm</label>
+            <input class="form-input" id="confirmPass" type="password" placeholder="Confirm password">
+          </div>
+        </div>
+        <p id="passError" style="font-size:11px;color:#e05050;min-height:16px;"></p>
+        <button class="save-btn" id="savePass">Update Password</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast">Saved</div>
+
+<script src="config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/project_data.js"></script>
+<script>
+// ── Auth guard ──
+if (sessionStorage.getItem('jack_auth') !== '1') window.location.href = 'index.html';
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Saved';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Sidebar nav ──
+const panelNames = { site:'Site Settings', projects:'Projects', videos:'Videos', cards:'Card Size', about:'About', security:'Security' };
+document.querySelectorAll('.nav-item[data-panel]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item[data-panel]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const id = 'panel' + btn.dataset.panel.charAt(0).toUpperCase() + btn.dataset.panel.slice(1);
+    document.getElementById(id).classList.add('active');
+    document.getElementById('panelTitle').textContent = panelNames[btn.dataset.panel] || '';
+  });
+});
+
+// ══════════════════════════════════════
+// SITE SETTINGS
+// ══════════════════════════════════════
+document.getElementById('cfgSiteName').value  = lsGet('site_name')  || SITE_CONFIG.site_name  || '';
+document.getElementById('cfgSiteTitle').value = lsGet('site_title') || SITE_CONFIG.site_title || '';
+document.getElementById('cfgFooter').value    = lsGet('footer_text') || '© 2025 Kim Hee Jae · Seoul, Korea';
+
+document.getElementById('cfgEyebrow').value    = lsGet('home_eyebrow')    || '';
+document.getElementById('cfgChTag').value      = lsGet('home_ch_tag')     || '';
+document.getElementById('cfgChQuote').value    = lsGet('home_ch_quote')   || '';
+document.getElementById('cfgChNameLine1').value = lsGet('home_name_l1')   || '';
+document.getElementById('cfgChNameLine2').value = lsGet('home_name_l2')   || '';
+
+const ruleW = document.getElementById('ruleWidthRange');
+const ruleH = document.getElementById('ruleHeightRange');
+const ruleWVal = document.getElementById('ruleWidthVal');
+const ruleHVal = document.getElementById('ruleHeightVal');
+ruleW.value = lsGet('rule_width')  || 48;  ruleWVal.textContent = ruleW.value + 'px';
+ruleH.value = lsGet('rule_height') || 1;   ruleHVal.textContent = ruleH.value + 'px';
+ruleW.addEventListener('input', () => { ruleWVal.textContent = ruleW.value + 'px'; });
+ruleH.addEventListener('input', () => { ruleHVal.textContent = ruleH.value + 'px'; });
+
+document.getElementById('saveSite').addEventListener('click', () => {
+  lsSet('site_name',    document.getElementById('cfgSiteName').value.trim());
+  lsSet('site_title',   document.getElementById('cfgSiteTitle').value.trim());
+  lsSet('footer_text',  document.getElementById('cfgFooter').value.trim());
+  showToast('Site settings saved — 홈페이지 새로고침하면 적용됩니다');
+});
+
+const animDurRange   = document.getElementById('animDurRange');
+const animDelayRange = document.getElementById('animDelayRange');
+const animDurVal     = document.getElementById('animDurVal');
+const animDelayVal   = document.getElementById('animDelayVal');
+animDurRange.value   = lsGet('anim_dur')   || 0.9;   animDurVal.textContent   = animDurRange.value + 's';
+animDelayRange.value = lsGet('anim_delay') || 0.075; animDelayVal.textContent = animDelayRange.value + 's';
+animDurRange.addEventListener('input',   () => { animDurVal.textContent   = parseFloat(animDurRange.value).toFixed(1) + 's'; });
+animDelayRange.addEventListener('input', () => { animDelayVal.textContent = parseFloat(animDelayRange.value).toFixed(3).replace(/0+$/,'') + 's'; });
+
+document.getElementById('saveHomeText').addEventListener('click', () => {
+  lsSet('home_eyebrow',  document.getElementById('cfgEyebrow').value.trim());
+  lsSet('home_ch_tag',   document.getElementById('cfgChTag').value.trim());
+  lsSet('home_ch_quote', document.getElementById('cfgChQuote').value.trim());
+  lsSet('home_name_l1',  document.getElementById('cfgChNameLine1').value.trim());
+  lsSet('home_name_l2',  document.getElementById('cfgChNameLine2').value.trim());
+  lsSet('rule_width',    ruleW.value);
+  lsSet('rule_height',   ruleH.value);
+  lsSet('anim_dur',      animDurRange.value);
+  lsSet('anim_delay',    animDelayRange.value);
+  showToast('Home text saved — 홈페이지 새로고침하면 적용됩니다');
+});
+
+// ══════════════════════════════════════
+// VIDEOS
+// ══════════════════════════════════════
+document.getElementById('vid1Name').value = lsGet('vid1') || '';
+document.getElementById('vid2Name').value = lsGet('vid2') || '';
+
+const scrollTrackRange = document.getElementById('scrollTrackRange');
+const scrollTrackVal   = document.getElementById('scrollTrackVal');
+scrollTrackRange.value = lsGet('scroll_track') || 250;
+scrollTrackVal.textContent = scrollTrackRange.value + 'vh';
+scrollTrackRange.addEventListener('input', () => { scrollTrackVal.textContent = scrollTrackRange.value + 'vh'; });
+
+document.getElementById('saveVideos').addEventListener('click', () => {
+  lsSet('vid1', document.getElementById('vid1Name').value.trim());
+  lsSet('vid2', document.getElementById('vid2Name').value.trim());
+  lsSet('scroll_track', scrollTrackRange.value);
+  showToast('Videos saved — 홈페이지 새로고침하면 적용됩니다');
+});
+
+// ══════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════
+let _activeCat = 'work';
+let _editId    = null;
+
+const projTabLabel = document.getElementById('projTabLabel');
+const projList     = document.getElementById('projList');
+const projFormCard = document.getElementById('projFormCard');
+
+const catLabels = { work:'Work', student:'Student', other:'Other' };
+
+function renderProjList() {
+  const projects = getProjects();
+  projTabLabel.textContent = catLabels[_activeCat] + ' Projects';
+  const list = projects.filter(p => p.category === _activeCat);
+
+  if (!list.length) {
+    projList.innerHTML = '<p style="font-size:12px;color:rgba(255,255,255,0.3);padding:8px 0;">No projects yet.</p>';
+    return;
+  }
+
+  projList.innerHTML = list.map((p, idx) => `
+    <div class="proj-list-item">
+      <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+        <button class="icon-btn" data-up="${p.id}" ${idx===0?'style="opacity:0.2;pointer-events:none;"':''}>↑</button>
+        <button class="icon-btn" data-down="${p.id}" ${idx===list.length-1?'style="opacity:0.2;pointer-events:none;"':''}>↓</button>
+      </div>
+      <img class="proj-thumb" src="${p.images[0]||''}" alt="" onerror="this.style.visibility='hidden'">
+      <div class="proj-info">
+        <strong>${p.title}</strong>
+        <span>${p.cat}</span>
+      </div>
+      <div class="proj-actions">
+        <button class="icon-btn" data-edit="${p.id}">Edit</button>
+        <button class="icon-btn red" data-del="${p.id}">Delete</button>
+      </div>
+    </div>
+  `).join('');
+
+  projList.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', () => openProjForm(btn.dataset.edit));
+  });
+  projList.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deleteProj(btn.dataset.del));
+  });
+  projList.querySelectorAll('[data-up]').forEach(btn => {
+    btn.addEventListener('click', () => moveProj(btn.dataset.up, -1));
+  });
+  projList.querySelectorAll('[data-down]').forEach(btn => {
+    btn.addEventListener('click', () => moveProj(btn.dataset.down, 1));
+  });
+}
+
+let _pendingImages = []; // base64 array for current edit
+
+function compressImage(file, maxW, maxH, quality) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = h * maxW / w; w = maxW; }
+        if (h > maxH) { w = w * maxH / h; h = maxH; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+let _dragImgIdx = null;
+
+function renderImgPreview(images) {
+  const wrap  = document.getElementById('projImgPreview');
+  const count = document.getElementById('projImgCount');
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;padding:4px 0;';
+  wrap.innerHTML = images.map((src, i) => `
+    <div draggable="true" data-i="${i}"
+      style="position:relative;cursor:grab;border-radius:8px;border:2px solid transparent;transition:border-color 0.15s,opacity 0.15s;">
+      <img src="${src}" style="width:84px;height:64px;object-fit:cover;border-radius:6px;display:block;pointer-events:none;">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);border-radius:0 0 6px 6px;font-size:9px;text-align:center;padding:2px 0;color:rgba(255,255,255,0.75);letter-spacing:0.05em;">${i+1}</div>
+      <button onclick="removeImg(${i})" style="position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:#c0392b;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;line-height:1;">✕</button>
+    </div>`).join('');
+
+  wrap.querySelectorAll('[draggable]').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      _dragImgIdx = +el.dataset.i;
+      el.style.opacity = '0.35';
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.style.opacity = '1';
+      wrap.querySelectorAll('[draggable]').forEach(d => d.style.borderColor = 'transparent');
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      el.style.borderColor = 'rgba(255,255,255,0.55)';
+    });
+    el.addEventListener('dragleave', () => { el.style.borderColor = 'transparent'; });
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      const toIdx = +el.dataset.i;
+      if (_dragImgIdx !== null && _dragImgIdx !== toIdx) {
+        const moved = _pendingImages.splice(_dragImgIdx, 1)[0];
+        _pendingImages.splice(toIdx, 0, moved);
+        renderImgPreview(_pendingImages);
+      }
+    });
+  });
+
+  count.textContent = images.length ? images.length + '장 — 드래그로 순서 변경 가능' : '';
+}
+
+function removeImg(idx) {
+  _pendingImages.splice(idx, 1);
+  renderImgPreview(_pendingImages);
+}
+
+document.getElementById('projImageFiles').addEventListener('change', async function() {
+  const files = [...this.files];
+  const count = document.getElementById('projImgCount');
+  count.textContent = '압축 중...';
+  const compressed = await Promise.all(files.map(f => compressImage(f, 1200, 900, 0.82)));
+  _pendingImages = [..._pendingImages, ...compressed];
+  renderImgPreview(_pendingImages);
+  this.value = '';
+});
+
+function openProjForm(id) {
+  _editId = id || null;
+  _pendingImages = [];
+  document.getElementById('projFormTitle').textContent = id ? 'Edit Project' : 'New Project';
+  projFormCard.style.display = 'block';
+  projFormCard.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  if (id) {
+    const p = getProjects().find(x => x.id === id);
+    if (p) {
+      document.getElementById('projCat').value     = p.cat;
+      document.getElementById('projCatKo').value   = p.cat_ko   || '';
+      document.getElementById('projTitle').value   = p.title;
+      document.getElementById('projTitleKo').value = p.title_ko || '';
+      _pendingImages = [...p.images];
+    }
+  } else {
+    document.getElementById('projCat').value     = '';
+    document.getElementById('projCatKo').value   = '';
+    document.getElementById('projTitle').value   = '';
+    document.getElementById('projTitleKo').value = '';
+  }
+  renderImgPreview(_pendingImages);
+}
+
+function moveProj(id, dir) {
+  const projects = getProjects();
+  const catList  = projects.filter(p => p.category === _activeCat);
+  const idx      = catList.findIndex(p => p.id === id);
+  const newIdx   = idx + dir;
+  if (newIdx < 0 || newIdx >= catList.length) return;
+
+  // swap in the full projects array
+  const globalIdx    = projects.indexOf(catList[idx]);
+  const globalNewIdx = projects.indexOf(catList[newIdx]);
+  [projects[globalIdx], projects[globalNewIdx]] = [projects[globalNewIdx], projects[globalIdx]];
+
+  saveProjects(projects);
+  renderProjList();
+}
+
+function deleteProj(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  const projects = getProjects().filter(p => p.id !== id);
+  saveProjects(projects);
+  renderProjList();
+  showToast('Deleted');
+}
+
+document.getElementById('addProjBtn').addEventListener('click', () => openProjForm(null));
+
+document.getElementById('saveProjBtn').addEventListener('click', () => {
+  const cat     = document.getElementById('projCat').value.trim();
+  const catKo   = document.getElementById('projCatKo').value.trim();
+  const title   = document.getElementById('projTitle').value.trim();
+  const titleKo = document.getElementById('projTitleKo').value.trim();
+
+  if (!title) { alert('Title is required.'); return; }
+  if (!_pendingImages.length) { alert('이미지를 1장 이상 선택해주세요.'); return; }
+
+  const projects = getProjects();
+  const wasEdit  = !!_editId;
+
+  if (_editId) {
+    const p = projects.find(x => x.id === _editId);
+    if (p) { p.cat = cat; p.cat_ko = catKo; p.title = title; p.title_ko = titleKo; p.images = _pendingImages; }
+  } else {
+    projects.push({ id: _activeCat + '-' + Date.now(), category: _activeCat, cat, cat_ko: catKo, title, title_ko: titleKo, images: _pendingImages });
+  }
+
+  saveProjects(projects);
+  _pendingImages = [];
+  _editId = null;
+  projFormCard.style.display = 'none';
+  renderImgPreview([]);
+  renderProjList();
+  showToast(wasEdit ? 'Updated' : 'Project added — 홈페이지 새로고침하면 적용됩니다');
+});
+
+document.getElementById('cancelProjBtn').addEventListener('click', () => {
+  projFormCard.style.display = 'none';
+  _editId = null;
+});
+
+document.querySelectorAll('.proj-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.proj-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    _activeCat = tab.dataset.cat;
+    projFormCard.style.display = 'none';
+    renderProjList();
+  });
+});
+
+renderProjList();
+
+// ══════════════════════════════════════
+// CARD LAYOUT
+// ══════════════════════════════════════
+const cardSliders = [
+  { id:'cardSizeRange',   valId:'cardSizeVal',   key:'card_size',    def:85,   unit:'%',  store: v => v/100, load: v => Math.round(v*100) },
+  { id:'cardWidthRange',  valId:'cardWidthVal',  key:'card_width',   def:100,  unit:'%',  store: v => v,     load: v => v },
+  { id:'cardHeightRange', valId:'cardHeightVal', key:'card_height',  def:1000, unit:'px', store: v => v,     load: v => v },
+  { id:'cardPadRange',    valId:'cardPadVal',    key:'card_pad',     def:32,   unit:'px', store: v => v,     load: v => v },
+  { id:'cardGapRange',    valId:'cardGapVal',    key:'card_gap',     def:1040, unit:'px', store: v => v,     load: v => v },
+  { id:'cardRadiusRange', valId:'cardRadiusVal', key:'card_radius',  def:60,   unit:'px', store: v => v,     load: v => v },
+];
+
+cardSliders.forEach(s => {
+  const range = document.getElementById(s.id);
+  const val   = document.getElementById(s.valId);
+  const saved = lsGet(s.key);
+  const initVal = saved !== null ? s.load(parseFloat(saved)) : s.def;
+  range.value = initVal;
+  val.textContent = initVal + s.unit;
+  range.addEventListener('input', () => { val.textContent = range.value + s.unit; });
+});
+
+document.getElementById('saveCards').addEventListener('click', () => {
+  cardSliders.forEach(s => {
+    lsSet(s.key, s.store(parseInt(document.getElementById(s.id).value)));
+  });
+  showToast('Card layout saved — 홈페이지 새로고침하면 적용됩니다');
+});
+
+// ══════════════════════════════════════
+// ABOUT — Profile Photo
+// ══════════════════════════════════════
+const savedPhoto = lsGet('about_photo');
+if (savedPhoto) {
+  const prev = document.getElementById('aboutPhotoPreview');
+  prev.src = savedPhoto; prev.style.display = 'block';
+}
+
+document.getElementById('aboutPhotoFile').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    lsSet('about_photo', e.target.result);
+    const prev = document.getElementById('aboutPhotoPreview');
+    prev.src = e.target.result; prev.style.display = 'block';
+    showToast('Photo saved — 홈페이지 새로고침하면 적용됩니다');
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('removePhotoBtn').addEventListener('click', () => {
+  lsSet('about_photo', '');
+  const prev = document.getElementById('aboutPhotoPreview');
+  prev.src = ''; prev.style.display = 'none';
+  showToast('Photo removed');
+});
+
+// ══════════════════════════════════════
+// ABOUT — Bio
+// ══════════════════════════════════════
+document.getElementById('cfgBio').value = lsGet('bio_en') || document.getElementById('cfgBio').placeholder || '';
+const defaultBio = 'Born in 1991, Yongsan, Seoul. Exploring the relationship between people and space through architectural design. Experience spanning commercial, residential, and cultural typologies.';
+document.getElementById('cfgBio').value = lsGet('bio_en') || defaultBio;
+
+document.getElementById('saveAbout').addEventListener('click', () => {
+  lsSet('bio_en', document.getElementById('cfgBio').value.trim());
+  showToast('Bio saved');
+});
+
+// ══════════════════════════════════════
+// ABOUT — Skills
+// ══════════════════════════════════════
+const defaultSkills = [
+  { name:'Auto CAD', pct:100 }, { name:'Rhino', pct:100 }, { name:'Revit', pct:100 },
+  { name:'Lumion', pct:100 },   { name:'Twinmotion', pct:100 }, { name:'SketchUp', pct:80 },
+  { name:'V-Ray', pct:80 },     { name:'Photoshop', pct:80 },   { name:'Illustrator', pct:80 },
+];
+
+function renderSkillEditor() {
+  const saved  = lsGet('skills');
+  const skills = saved ? JSON.parse(saved) : defaultSkills;
+  document.getElementById('skillEditor').innerHTML = skills.map((s, i) => `
+    <div class="form-range-row">
+      <label>${s.name}</label>
+      <input type="range" min="0" max="100" value="${s.pct}" data-idx="${i}" class="skill-range">
+      <span class="range-val" id="rv${i}">${s.pct}%</span>
+    </div>`).join('');
+  document.querySelectorAll('.skill-range').forEach(r => {
+    r.addEventListener('input', () => { document.getElementById('rv' + r.dataset.idx).textContent = r.value + '%'; });
+  });
+}
+renderSkillEditor();
+
+document.getElementById('saveSkills').addEventListener('click', () => {
+  const saved  = lsGet('skills');
+  const skills = saved ? JSON.parse(saved) : defaultSkills;
+  document.querySelectorAll('.skill-range').forEach(r => { skills[+r.dataset.idx].pct = +r.value; });
+  lsSet('skills', JSON.stringify(skills));
+  showToast('Skills saved');
+});
+
+// ══════════════════════════════════════
+// SECURITY
+// ══════════════════════════════════════
+document.getElementById('savePass').addEventListener('click', () => {
+  const np  = document.getElementById('newPass').value;
+  const cp  = document.getElementById('confirmPass').value;
+  const err = document.getElementById('passError');
+  if (!np)       { err.textContent = 'Enter a new password.'; return; }
+  if (np !== cp) { err.textContent = 'Passwords do not match.'; return; }
+  err.textContent = '';
+  lsSet('jack_admin_pass', np);
+  document.getElementById('newPass').value    = '';
+  document.getElementById('confirmPass').value = '';
+  showToast('Password updated');
+});
+</script>
+</body>
+</html>

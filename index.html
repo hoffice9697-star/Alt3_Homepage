@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeeJae Kim PORTFOLIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── FIXED NAVBAR ── -->
+  <nav class="hero-nav" id="heroNav">
+    <div class="nav-pill">
+      <div id="navIndicator" class="nav-indicator"></div>
+      <a href="#"         class="nav-link active" data-section="top"      data-en="Home"     data-ko="홈">Home</a>
+      <a href="#about"    class="nav-link" data-section="about"    data-en="About"    data-ko="소개">About</a>
+      <a href="#projects" class="nav-link" data-section="projects" data-en="Projects" data-ko="프로젝트">Projects</a>
+      <button id="langToggle" class="nav-link lang-toggle">KO</button>
+    </div>
+  </nav>
+
+  <!-- ── 1. SCROLL-DRIVEN VIDEO STAGE ── -->
+  <div id="scrollStage">
+    <div id="stickyCanvas">
+
+      <div id="vid1" class="stage-video active"></div>
+      <div id="vid2" class="stage-video"></div>
+      <script src="https://player.vimeo.com/api/player.js"></script>
+
+      <div class="stage-vignette"></div>
+      <div class="stage-bottom-fade"></div>
+
+      <!-- Chapter 1 — scene1 (0~50%) -->
+      <div class="stage-chapter" data-from="0" data-to="0.5">
+        <p class="ch-eyebrow" data-en="Architect" data-ko="건축가">Architect</p>
+        <h1 class="ch-name hero-heading-style">HeeJae Kim<br><em>PORTFOLIO</em></h1>
+        <div class="ch-rule"></div>
+      </div>
+
+      <!-- Chapter 2 — scene2 (50~100%) -->
+      <div class="stage-chapter" data-from="0.5" data-to="1">
+        <p class="ch-tag" data-en="Architecture / Design / Planning" data-ko="건축 / 디자인 / 계획">Architecture / Design / Planning</p>
+        <p class="ch-quote" data-en-html="Designing Spaces That<br>Inspire and Endure" data-ko-html="영감을 주고 오래 지속되는<br>공간을 설계합니다">Designing Spaces That<br>Inspire and Endure</p>
+        <a href="#marqueeSection" class="ch-cta" data-en="Explore ↓" data-ko="더 보기 ↓">Explore ↓</a>
+      </div>
+
+      <!-- Progress bar -->
+      <div id="progressBar"><div id="progressFill"></div></div>
+
+      <!-- Scroll cue -->
+      <div id="scrollCue">
+        <span class="sc-text">Scroll</span>
+        <div class="sc-line"><div class="sc-dot"></div></div>
+      </div>
+
+    </div>
+    <div id="scrollTrack"></div>
+  </div>
+
+  <!-- ── 2. MARQUEE — 99_portfolio 이미지 랜덤 (F5마다 변경) ── -->
+  <section id="marqueeSection">
+    <div class="mq-row" id="mq1"></div>
+    <div class="mq-row" id="mq2"></div>
+  </section>
+
+  <script>
+  (function() {
+    // 99_portfolio 전체 이미지 목록
+    const POOL = [
+      // 02_work
+      '99_portfolio/02_work/1-1.png','99_portfolio/02_work/1-2.png','99_portfolio/02_work/1-3.png','99_portfolio/02_work/1-4.png','99_portfolio/02_work/1-5.png','99_portfolio/02_work/1-6.png',
+      '99_portfolio/02_work/2-1.png','99_portfolio/02_work/2-2.png','99_portfolio/02_work/2-3.png','99_portfolio/02_work/2-4.png','99_portfolio/02_work/2-5.png','99_portfolio/02_work/2-6.png','99_portfolio/02_work/2-7.png','99_portfolio/02_work/2-8.png','99_portfolio/02_work/2-9.png','99_portfolio/02_work/2-10.png',
+      '99_portfolio/02_work/3-1.png','99_portfolio/02_work/3-2.png','99_portfolio/02_work/3-3.png','99_portfolio/02_work/3-4.png','99_portfolio/02_work/3-5.png','99_portfolio/02_work/3-6.png','99_portfolio/02_work/3-7.png','99_portfolio/02_work/3-8.png',
+      '99_portfolio/02_work/4-1.png','99_portfolio/02_work/4-2.png','99_portfolio/02_work/4-3.png','99_portfolio/02_work/4-4.png',
+      '99_portfolio/02_work/001_FIN/001.jpg','99_portfolio/02_work/001_FIN/002.jpg','99_portfolio/02_work/001_FIN/003.jpg','99_portfolio/02_work/001_FIN/004.jpg','99_portfolio/02_work/001_FIN/005.jpg','99_portfolio/02_work/001_FIN/006.jpg','99_portfolio/02_work/001_FIN/007.jpg','99_portfolio/02_work/001_FIN/008.jpg','99_portfolio/02_work/001_FIN/009.jpg','99_portfolio/02_work/001_FIN/010.jpg','99_portfolio/02_work/001_FIN/012.gif',
+      // 01_student
+      '99_portfolio/01_student/1-1.png','99_portfolio/01_student/1-2.png','99_portfolio/01_student/1-3.png','99_portfolio/01_student/1-4.png','99_portfolio/01_student/1-5.png',
+      '99_portfolio/01_student/2-1.png','99_portfolio/01_student/2-2.png','99_portfolio/01_student/2-3.png',
+      '99_portfolio/01_student/3-1.png','99_portfolio/01_student/3-2.png','99_portfolio/01_student/3-3.png','99_portfolio/01_student/3-4.png',
+      '99_portfolio/01_student/4-1.png','99_portfolio/01_student/4-2.png','99_portfolio/01_student/4-3.png','99_portfolio/01_student/4-4.png','99_portfolio/01_student/4-5.png','99_portfolio/01_student/4-6.png',
+      '99_portfolio/01_student/5-1.png','99_portfolio/01_student/5-2.png','99_portfolio/01_student/5-3.png','99_portfolio/01_student/5-4.png','99_portfolio/01_student/5-5.png','99_portfolio/01_student/5-6.png',
+      // 03_otherprojects
+      '99_portfolio/03_otherprojects/002.jpeg','99_portfolio/03_otherprojects/003.jpeg','99_portfolio/03_otherprojects/004.jpeg','99_portfolio/03_otherprojects/005.jpeg','99_portfolio/03_otherprojects/006.jpeg','99_portfolio/03_otherprojects/007.jpeg','99_portfolio/03_otherprojects/008.jpeg','99_portfolio/03_otherprojects/009.jpeg','99_portfolio/03_otherprojects/010.jpeg','99_portfolio/03_otherprojects/011.jpeg','99_portfolio/03_otherprojects/012.jpeg','99_portfolio/03_otherprojects/013.jpeg','99_portfolio/03_otherprojects/014.jpeg','99_portfolio/03_otherprojects/015.jpeg','99_portfolio/03_otherprojects/016.jpeg','99_portfolio/03_otherprojects/017.jpeg','99_portfolio/03_otherprojects/018.jpeg','99_portfolio/03_otherprojects/019.jpeg','99_portfolio/03_otherprojects/020.jpeg','99_portfolio/03_otherprojects/021.jpeg','99_portfolio/03_otherprojects/022.jpeg','99_portfolio/03_otherprojects/023.jpeg','99_portfolio/03_otherprojects/024.jpeg','99_portfolio/03_otherprojects/025.jpeg',
+    ];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function fillRow(rowId, images) {
+      const row = document.getElementById(rowId);
+      // 무한 루프를 위해 3배 복제
+      const repeated = [...images, ...images, ...images];
+      row.innerHTML = repeated.map(src =>
+        `<img src="${src}" loading="lazy" alt="">`
+      ).join('');
+    }
+
+    const shuffled = shuffle(POOL);
+    const half = Math.ceil(shuffled.length / 2);
+    fillRow('mq1', shuffled.slice(0, half));
+    fillRow('mq2', shuffle(POOL).slice(0, half)); // 두 번째 줄은 다시 셔플
+  })();
+  </script>
+
+  <!-- ── 3. ABOUT ── -->
+  <section id="about">
+    <div class="about-wrap">
+      <div class="about-left fade-in-up">
+        <p class="about-sec-num" data-en="02 — About" data-ko="02 — 소개">02 — About</p>
+        <h2 class="about-name hero-heading-style">Kim<br>Hee Jae</h2>
+        <p class="about-bio" id="animBio" data-en="Born in 1991, Yongsan, Seoul. Exploring the relationship between people and space through architectural design. Experience spanning commercial, residential, and cultural typologies." data-ko="1991년 서울 용산 출생. 건축 디자인을 통해 사람과 공간의 관계를 탐구합니다. 상업, 주거, 문화 등 다양한 건축 유형에서 경험을 쌓았습니다.">Born in 1991, Yongsan, Seoul. Exploring the relationship between people and space through architectural design. Experience spanning commercial, residential, and cultural typologies.</p>
+        <div class="award-list">
+          <div class="award-row"><span class="ay">2017</span><span>차세대문화건축대전 Choice Award</span></div>
+          <div class="award-row"><span class="ay">2017</span><span>게원예술제 전시회 우수작 수상</span></div>
+          <div class="award-row"><span class="ay">2018</span><span>안양건축대전 Choice Award</span></div>
+          <div class="award-row"><span class="ay">2019</span><span>Museum San 건축디자인 공모전</span></div>
+          <div class="award-row"><span class="ay">2019</span><span>정림학생건축상 참가</span></div>
+          <div class="award-row"><span class="ay">2020</span><span>광진구 구의도시생활성화계획</span></div>
+        </div>
+      </div>
+      <div class="about-right fade-in-up">
+        <p class="skill-label" data-en="Software Skill" data-ko="소프트웨어 기술">Software Skill</p>
+        <div id="skillRadarContainer"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. SERVICES ── -->
+  <section id="services">
+    <h2 class="services-heading" data-en="Services" data-ko="서비스">Services</h2>
+    <div class="services-list">
+      <div class="service-item fade-in-up" style="--delay:0s">
+        <span class="service-num">01</span>
+        <div class="service-body">
+          <p class="service-name" data-en="Regulatory Review" data-ko="법규 검토">Regulatory Review</p>
+          <p class="service-desc" data-en="In-depth analysis of building codes, zoning ordinances, and land-use regulations to establish the legal framework and maximize the buildable potential of each project." data-ko="건축 법규, 지구단위계획, 용도지역 등 관련 규정을 면밀히 분석하여 프로젝트의 법적 틀을 수립하고 최적의 건축 가능 범위를 도출합니다.">In-depth analysis of building codes, zoning ordinances, and land-use regulations to establish the legal framework and maximize the buildable potential of each project.</p>
+        </div>
+      </div>
+      <div class="service-item fade-in-up" style="--delay:0.1s">
+        <span class="service-num">02</span>
+        <div class="service-body">
+          <p class="service-name" data-en="Architectural Design &amp; Planning" data-ko="건축 디자인 및 건축 계획">Architectural Design &amp; Planning</p>
+          <p class="service-desc" data-en="From conceptual massing studies to detailed floor, elevation, and section planning — comprehensive spatial design tailored to program requirements and site context." data-ko="개념적 매스 스터디부터 평면·입면·단면 계획까지, 프로그램과 대지 맥락에 맞는 공간 구성을 통해 건축의 완성도를 높입니다.">From conceptual massing studies to detailed floor, elevation, and section planning — comprehensive spatial design tailored to program requirements and site context.</p>
+        </div>
+      </div>
+      <div class="service-item fade-in-up" style="--delay:0.2s">
+        <span class="service-num">03</span>
+        <div class="service-body">
+          <p class="service-name" data-en="Permit &amp; Approval" data-ko="건축 인허가 및 심의">Permit &amp; Approval</p>
+          <p class="service-desc" data-en="Full coordination of building permit applications, architectural reviews, and regulatory approvals with local authorities — from document preparation through final issuance." data-ko="건축허가·건축심의·경관심의 등 관련 기관 협의 및 인허가 도서 작성부터 최종 승인까지 전 과정을 체계적으로 진행합니다.">Full coordination of building permit applications, architectural reviews, and regulatory approvals with local authorities — from document preparation through final issuance.</p>
+        </div>
+      </div>
+      <div class="service-item fade-in-up" style="--delay:0.3s">
+        <span class="service-num">04</span>
+        <div class="service-body">
+          <p class="service-name" data-en="Construction Documentation" data-ko="실시설계">Construction Documentation</p>
+          <p class="service-desc" data-en="Complete working drawings, specifications, and construction detail sets that precisely communicate design intent to contractors for faithful on-site execution." data-ko="시공에 필요한 실시도면, 시방서, 구조·설비 협의 및 상세도 일체를 작성하여 설계 의도가 현장에서 정확히 구현될 수 있도록 합니다.">Complete working drawings, specifications, and construction detail sets that precisely communicate design intent to contractors for faithful on-site execution.</p>
+        </div>
+      </div>
+      <div class="service-item fade-in-up" style="--delay:0.4s">
+        <span class="service-num">05</span>
+        <div class="service-body">
+          <p class="service-name" data-en="Occupancy Approval" data-ko="사용승인">Occupancy Approval</p>
+          <p class="service-desc" data-en="Management of all inspections, documentation, and authority coordination required to obtain the certificate of occupancy and officially complete the building for use." data-ko="준공검사, 서류 작성, 기관 협의 등 사용승인 취득을 위한 모든 과정을 관리하여 건축물의 공식 사용을 완결합니다.">Management of all inspections, documentation, and authority coordination required to obtain the certificate of occupancy and officially complete the building for use.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. PROJECTS ── -->
+  <section id="projects">
+    <h2 class="projects-heading hero-heading-style" data-en="Project" data-ko="프로젝트">Project</h2>
+
+    <!-- 카테고리 탭 필 -->
+    <div class="project-tab-wrap">
+      <div class="project-tab-pill">
+        <div id="projIndicator" class="proj-indicator"></div>
+        <button class="ptab active" data-group="work"    data-en="Work"           data-ko="실무">Work</button>
+        <button class="ptab"        data-group="other"   data-en="Other Projects" data-ko="그 외 프로젝트">Other Projects</button>
+        <button class="ptab"        data-group="student" data-en="Student"        data-ko="학생">Student</button>
+      </div>
+    </div>
+
+    <!-- ── WORK GROUP ── -->
+    <div class="project-group active" id="group-work"></div>
+
+    <!-- ── STUDENT GROUP ── -->
+    <div class="project-group" id="group-student"></div>
+
+    <!-- ── OTHER GROUP ── -->
+    <div class="project-group" id="group-other"></div>
+
+  </section>
+
+  <!-- ── 라이트박스 (View All 클릭 → 즉시 1-1부터 표시) ── -->
+  <div id="modalLightbox" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.98);align-items:center;justify-content:center;flex-direction:column;">
+    <button id="mlbClose" style="position:absolute;top:24px;right:28px;font-size:20px;color:rgba(215,226,234,0.6);background:none;border:none;cursor:pointer;font-family:'Kanit',sans-serif;">✕</button>
+    <p id="mlbTitle" style="position:absolute;top:26px;left:40px;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(215,226,234,0.5);font-family:'Kanit',sans-serif;"></p>
+    <button id="mlbPrev" style="position:absolute;left:24px;top:50%;transform:translateY(-50%);font-size:28px;color:rgba(215,226,234,0.5);background:none;border:none;cursor:pointer;padding:12px;">←</button>
+    <button id="mlbNext" style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:28px;color:rgba(215,226,234,0.5);background:none;border:none;cursor:pointer;padding:12px;">→</button>
+    <img id="mlbImg" src="" alt="" style="max-width:88vw;max-height:86vh;object-fit:contain;border-radius:8px;">
+    <p id="mlbCounter" style="margin-top:16px;font-size:11px;letter-spacing:0.2em;color:rgba(215,226,234,0.4);font-family:'Kanit',sans-serif;"></p>
+  </div>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <p class="footer-copy"><span id="adminTrigger" class="admin-trigger">©</span> 2025 Kim Hee Jae · Seoul, Korea</p>
+  </footer>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" class="admin-modal">
+    <div class="admin-modal-box">
+      <button class="admin-modal-close" id="adminModalClose">✕</button>
+      <h3>Admin</h3>
+      <input type="password" id="adminPassInput" placeholder="Password">
+      <p class="admin-error" id="adminError"></p>
+      <button class="admin-login-btn" id="adminSubmit">Login</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/project_data.js"></script>
+  <script src="js/nav_manager.js"></script>
+  <script src="js/video_manager.js"></script>
+  <script src="js/scroll_manager.js"></script>
+  <script src="js/cursor_manager.js"></script>
+  <script src="js/admin_manager.js"></script>
+  <script src="js/skill_radar_manager.js"></script>
+  <script src="js/lang_manager.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  // ── Video sources from localStorage ──
+  (function() {
+    const st = lsGet('scroll_track'); if (st) { const el = document.getElementById('scrollTrack'); if (el) el.style.height = st + 'vh'; }
+  })();
+
+  // ── Char animation speed from localStorage ──
+  (function() {
+    const dur   = parseFloat(lsGet('anim_dur'))   || 0.9;
+    const delay = parseFloat(lsGet('anim_delay')) || 0.075;
+    window._animDur   = dur;
+    window._animDelay = delay;
+    const s = document.createElement('style');
+    s.textContent = `.char-ani { animation-duration: ${dur}s !important; }`;
+    document.head.appendChild(s);
+  })();
+
+  // ── Card layout settings from localStorage ──
+  (function() {
+    const width   = parseFloat(lsGet('card_width'))   || 100;
+    const height  = parseFloat(lsGet('card_height'))  || 1000;
+    const pad     = parseFloat(lsGet('card_pad'))     || 32;
+    const gap     = parseFloat(lsGet('card_gap'))     || 1040;
+    const radius  = parseFloat(lsGet('card_radius'))  || 60;
+
+    const style = document.createElement('style');
+    const imgGridMax = Math.max(200, height - 120);
+    style.textContent = `
+      .stack-card-inner { width:${width}% !important; margin:0 auto !important; height:${height}px !important; padding:${pad}px !important; border-radius:${radius}px !important; justify-content:space-between !important; }
+      .card-img-grid    { max-height:${imgGridMax}px !important; }
+      .stack-card-wrap  { height:${gap}px !important; }
+      .project-group .stack-card-wrap:last-child { height:${gap + 360}px !important; }
+    `;
+    document.head.appendChild(style);
+  })();
+
+  // ── Site settings from localStorage ──
+  (function() {
+    const title  = lsGet('site_title');
+    if (title) document.title = title;
+
+    const eyebrow = lsGet('home_eyebrow');
+    if (eyebrow) { const el = document.querySelector('.ch-eyebrow'); if (el) { el.textContent = eyebrow; el.dataset.en = eyebrow; } }
+    const chTag = lsGet('home_ch_tag');
+    if (chTag) { const el = document.querySelector('.ch-tag'); if (el) { el.textContent = chTag; el.dataset.en = chTag; } }
+    const chQuote = lsGet('home_ch_quote');
+    if (chQuote) { const el = document.querySelector('.ch-quote'); if (el) { el.innerHTML = chQuote; el.dataset.enHtml = chQuote; } }
+
+    const nameL1 = lsGet('home_name_l1');
+    const nameL2 = lsGet('home_name_l2');
+    if (nameL1 || nameL2) {
+      const el = document.querySelector('.ch-name');
+      if (el) el.innerHTML = (nameL1 || 'HeeJae Kim') + '<br><em>' + (nameL2 || 'PORTFOLIO') + '</em>';
+    }
+
+    const ruleW = lsGet('rule_width');
+    const ruleH = lsGet('rule_height');
+    if (ruleW || ruleH) {
+      const el = document.querySelector('.ch-rule');
+      if (el) { if (ruleW) el.style.width = ruleW + 'px'; if (ruleH) el.style.height = ruleH + 'px'; }
+    }
+
+    const bio = lsGet('bio_en');
+    if (bio) { const el = document.getElementById('animBio'); if (el) el.textContent = bio; }
+
+    const footer = lsGet('footer_text');
+    if (footer) { const el = document.querySelector('.footer-copy'); if (el) el.innerHTML = el.innerHTML.replace(/©.*$/, footer); }
+
+    const photo = lsGet('about_photo');
+    if (photo) {
+      const aboutLeft = document.querySelector('.about-left');
+      if (aboutLeft) {
+        const img = document.createElement('img');
+        img.src = photo;
+        img.id = 'aboutProfilePhoto';
+        img.style.cssText = 'float:right;width:160px;height:200px;border-radius:14px;object-fit:cover;margin:40px 0 24px 32px;border:1px solid rgba(255,255,255,0.12);';
+        aboutLeft.insertBefore(img, aboutLeft.firstChild);
+      }
+    }
+  })();
+
+  // ── Dynamic project rendering ──
+  renderProjects();
+
+  // ── 우클릭 / 이미지 드래그 방지 ──
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('dragstart',   e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+  </script>
+
+  <script>
+  /* ── 프로젝트 탭 인디케이터 ── */
+  function moveProjIndicator(activeBtn) {
+    const indicator = document.getElementById('projIndicator');
+    const pill      = document.querySelector('.project-tab-pill');
+    if (!indicator || !pill || !activeBtn) return;
+    const pillRect   = pill.getBoundingClientRect();
+    const activeRect = activeBtn.getBoundingClientRect();
+    indicator.style.left  = (activeRect.left - pillRect.left) + 'px';
+    indicator.style.width = activeRect.width + 'px';
+  }
+
+  /* ── 탭 전환 ── */
+  document.querySelectorAll('.ptab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.project-group').forEach(g => g.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('group-' + btn.dataset.group).classList.add('active');
+      document.getElementById('projects').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      moveProjIndicator(btn);
+    });
+  });
+
+  // 초기 인디케이터 위치
+  requestAnimationFrame(() => moveProjIndicator(document.querySelector('.ptab.active')));
+
+  /* ── View All → 즉시 라이트박스 (1-1 순서부터) ── */
+  let _mlbAll = [], _mlbIdx = 0;
+
+  function openProjectImages(imgs, title) {
+    _mlbAll = Array.isArray(imgs) ? imgs : imgs;
+    _mlbIdx = 0;
+    document.getElementById('mlbTitle').textContent = title;
+    _renderMlb();
+    document.getElementById('modalLightbox').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function _renderMlb() {
+    document.getElementById('mlbImg').src = _mlbAll[_mlbIdx];
+    document.getElementById('mlbCounter').textContent = (_mlbIdx + 1) + ' / ' + _mlbAll.length;
+  }
+
+  document.getElementById('mlbClose').addEventListener('click', () => { document.getElementById('modalLightbox').style.display = 'none'; document.body.style.overflow = ''; });
+  document.getElementById('mlbPrev').addEventListener('click',  () => { _mlbIdx = (_mlbIdx - 1 + _mlbAll.length) % _mlbAll.length; _renderMlb(); });
+  document.getElementById('mlbNext').addEventListener('click',  () => { _mlbIdx = (_mlbIdx + 1) % _mlbAll.length; _renderMlb(); });
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('modalLightbox').style.display !== 'flex') return;
+    if (e.key === 'ArrowLeft')  { _mlbIdx = (_mlbIdx - 1 + _mlbAll.length) % _mlbAll.length; _renderMlb(); }
+    if (e.key === 'ArrowRight') { _mlbIdx = (_mlbIdx + 1) % _mlbAll.length; _renderMlb(); }
+    if (e.key === 'Escape')     { document.getElementById('modalLightbox').style.display = 'none'; document.body.style.overflow = ''; }
+  });
+  </script>
+</body>
+</html>
